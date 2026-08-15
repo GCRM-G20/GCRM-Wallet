@@ -1,0 +1,797 @@
+  1325→  const [stakeAmount, setStakeAmount] = useState('');
+  1326→  const [showCalculator, setShowCalculator] = useState(false);
+  1327→  const [calcAmount, setCalcAmount] = useState('1000');
+  1328→  const [calcDays, setCalcDays] = useState('90');
+  1329→
+  1330→  const pool = STAKING_POOLS.find((p) => p.id === selectedPool);
+  1331→  const estimatedRewards = pool ? calculateStakingRewards(parseFloat(calcAmount) || 0, pool.apy, parseFloat(calcDays) || 0) : 0;
+  1332→
+  1333→  const handleStake = useCallback(() => {
+  1334→    if (!pool) return;
+  1335→    if (parseFloat(stakeAmount) < pool.minStake) {
+  1336→      addToast(`Minimum stake is ${pool.minStake} GCRM`, 'error');
+  1337→      return;
+  1338→    }
+  1339→    const endDate = new Date();
+  1340→    endDate.setDate(endDate.getDate() + pool.duration);
+  1341→    addTransaction({
+  1342→      id: Date.now().toString(),
+  1343→      type: 'stake',
+  1344→      status: 'confirmed',
+  1345→      from: '',
+  1346→      to: '',
+  1347→      amount: parseFloat(stakeAmount).toLocaleString('en-US', { maximumFractionDigits: 2 }),
+  1348→      token: 'GCRM',
+  1349→      chain: 'BNB Smart Chain',
+  1350→      timestamp: Date.now(),
+  1351→    });
+  1352→    addToast(`Staked ${stakeAmount} GCRM successfully!`, 'success');
+  1353→    setSelectedPool(null);
+  1354→    setStakeAmount('');
+  1355→  }, [pool, stakeAmount, addTransaction, addToast]);
+  1356→
+  1357→  return (
+  1358→    <motion.div key="staking" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="min-h-screen pb-24">
+  1359→      <div className="px-4 pt-4 pb-2 flex items-center justify-between">
+  1360→        <h1 className="text-lg font-semibold">Staking</h1>
+  1361→        <button
+  1362→          onClick={() => setShowCalculator(!showCalculator)}
+  1363→          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary hover:bg-white/5 transition-colors"
+  1364→        >
+  1365→          <BarChart3 className="size-3.5 text-primary" />
+  1366→          <span className="text-xs">Calculator</span>
+  1367→        </button>
+  1368→      </div>
+  1369→
+  1370→      {/* Calculator */}
+  1371→      {showCalculator && (
+  1372→        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="px-4 mb-4">
+  1373→          <div className="glass-card rounded-xl p-4">
+  1374→            <h3 className="text-sm font-semibold mb-3">Rewards Calculator</h3>
+  1375→            <div className="flex gap-3 mb-3">
+  1376→              <div className="flex-1">
+  1377→                <label className="text-xs text-muted-foreground mb-1 block">Amount (GCRM)</label>
+  1378→                <Input type="number" value={calcAmount} onChange={(e) => setCalcAmount(e.target.value)} placeholder="1000" />
+  1379→              </div>
+  1380→              <div className="flex-1">
+  1381→                <label className="text-xs text-muted-foreground mb-1 block">Days</label>
+  1382→                <Input type="number" value={calcDays} onChange={(e) => setCalcDays(e.target.value)} placeholder="90" />
+  1383→              </div>
+  1384→            </div>
+  1385→            <div className="bg-primary/5 rounded-lg p-3 flex items-center justify-between">
+  1386→              <span className="text-xs text-muted-foreground">Estimated Rewards</span>
+  1387→              <span className="text-lg font-bold text-primary">{estimatedRewards.toFixed(2)} GCRM</span>
+  1388→            </div>
+  1389→          </div>
+  1390→        </motion.div>
+  1391→      )}
+  1392→
+  1393→      {/* Your Staking Info */}
+  1394→      <div className="px-4 mb-4">
+  1395→        <div className="glass-card rounded-xl p-4 flex items-center justify-between">
+  1396→          <div>
+  1397→            <p className="text-xs text-muted-foreground">Total Staked</p>
+  1398→            <p className="text-lg font-semibold">{stakingPositions.length > 0 ? '5,000.00' : '0.00'} GCRM</p>
+  1399→          </div>
+  1400→          <div className="text-right">
+  1401→            <p className="text-xs text-muted-foreground">Total Rewards</p>
+  1402→            <p className="text-lg font-semibold text-gcrm-green">{stakingPositions.length > 0 ? '123.45' : '0.00'} GCRM</p>
+  1403→          </div>
+  1404→        </div>
+  1405→      </div>
+  1406→
+  1407→      {/* Pools */}
+  1408→      <div className="px-4">
+  1409→        <h3 className="text-sm font-semibold mb-3">Staking Pools</h3>
+  1410→        <div className="flex flex-col gap-3">
+  1411→          {STAKING_POOLS.map((sp, i) => (
+  1412→            <motion.div
+  1413→              key={sp.id}
+  1414→              initial={{ opacity: 0, y: 10 }}
+  1415→              animate={{ opacity: 1, y: 0 }}
+  1416→              transition={{ delay: i * 0.08 }}
+  1417→              className="glass-card rounded-xl p-4 cursor-pointer hover:bg-white/[0.03] transition-colors"
+  1418→              onClick={() => setSelectedPool(selectedPool === sp.id ? null : sp.id)}
+  1419→            >
+  1420→              <div className="flex items-center justify-between mb-3">
+  1421→                <div className="flex items-center gap-2.5">
+  1422→                  <div className="w-10 h-10 rounded-xl gold-gradient flex items-center justify-center">
+  1423→                    <Coins className="size-5 text-black" />
+  1424→                  </div>
+  1425→                  <div>
+  1426→                    <p className="text-sm font-semibold">{sp.name}</p>
+  1427→                    <p className="text-xs text-muted-foreground">{sp.durationLabel} lock</p>
+  1428→                  </div>
+  1429→                </div>
+  1430→                <Badge className="bg-gcrm-green/10 text-gcrm-green border-gcrm-green/20 hover:bg-gcrm-green/15">{formatAPY(sp.apy)}</Badge>
+  1431→              </div>
+  1432→              <div className="flex items-center justify-between text-xs text-muted-foreground">
+  1433→                <span>TVL: {formatTVL(sp.tvl)}</span>
+  1434→                <span>Min: {sp.minStake.toLocaleString()} GCRM</span>
+  1435→              </div>
+  1436→
+  1437→              {/* Stake form when expanded */}
+  1438→              <AnimatePresence>
+  1439→                {selectedPool === sp.id && (
+  1440→                  <motion.div
+  1441→                    initial={{ opacity: 0, height: 0 }}
+  1442→                    animate={{ opacity: 1, height: 'auto' }}
+  1443→                    exit={{ opacity: 0, height: 0 }}
+  1444→                    className="mt-4"
+  1445→                  >
+  1446→                    <Separator className="bg-border mb-4" />
+  1447→                    <div className="flex flex-col gap-3">
+  1448→                      <div>
+  1449→                        <div className="flex items-center justify-between mb-1.5">
+  1450→                          <label className="text-xs text-muted-foreground">Amount (GCRM)</label>
+  1451→                          <span className="text-xs text-muted-foreground">Balance: {gcrmBalance || '12,580.00'}</span>
+  1452→                        </div>
+  1453→                        <div className="relative">
+  1454→                          <Input
+  1455→                            type="number"
+  1456→                            value={stakeAmount}
+  1457→                            onChange={(e) => setStakeAmount(e.target.value)}
+  1458→                            placeholder={`Min ${sp.minStake}`}
+  1459→                          />
+  1460→                          <button
+  1461→                            onClick={() => setStakeAmount(gcrmBalance || '12580')}
+  1462→                            className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-primary px-2 py-0.5 rounded bg-primary/10"
+  1463→                          >
+  1464→                            MAX
+  1465→                          </button>
+  1466→                        </div>
+  1467→                      </div>
+  1468→                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+  1469→                        <Clock className="size-3" />
+  1470→                        <span>Estimated: {calculateStakingRewards(parseFloat(stakeAmount) || 0, sp.apy, sp.duration).toFixed(2)} GCRM rewards</span>
+  1471→                      </div>
+  1472→                      <button
+  1473→                        onClick={handleStake}
+  1474→                        className="w-full h-10 rounded-xl gold-gradient text-black font-semibold text-sm hover:opacity-90 transition-opacity"
+  1475→                      >
+  1476→                        Stake GCRM
+  1477→                      </button>
+  1478→                    </div>
+  1479→                  </motion.div>
+  1480→                )}
+  1481→              </AnimatePresence>
+  1482→            </motion.div>
+  1483→          ))}
+  1484→        </div>
+  1485→      </div>
+  1486→    </motion.div>
+  1487→  );
+  1488→}
+  1489→
+  1490→// ─── DApps Screen ────────────────────────────────────────────────────
+  1491→function DAppsScreen() {
+  1492→  const navigate = useWalletStore((s) => s.navigate);
+  1493→  const addToast = useWalletStore((s) => s.addToast);
+  1494→
+  1495→  const popularDApps = [
+  1496→    { name: 'PancakeSwap', icon: '🍰', url: 'pancakeswap.finance', chain: 'BSC' },
+  1497→    { name: 'Uniswap', icon: '🦄', url: 'app.uniswap.org', chain: 'ETH' },
+  1498→    { name: 'Aave', icon: '👻', url: 'app.aave.com', chain: 'Multi' },
+  1499→    { name: 'Curve', icon: '🔵', url: 'curve.fi', chain: 'Multi' },
+  1500→    { name: '1inch', icon: '🦇', url: 'app.1inch.io', chain: 'Multi' },
+  1501→    { name: 'Lido', icon: '🌊', url: 'stake.lido.fi', chain: 'ETH' },
+  1502→  ];
+  1503→
+  1504→  return (
+  1505→    <motion.div key="dapps" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="min-h-screen pb-24">
+  1506→      <div className="px-4 pt-4 pb-2 flex items-center justify-between">
+  1507→        <h1 className="text-lg font-semibold">DApps</h1>
+  1508→        <button className="p-2 rounded-lg hover:bg-white/5">
+  1509→          <Search className="size-4 text-muted-foreground" />
+  1510→        </button>
+  1511→      </div>
+  1512→
+  1513→      {/* Connected DApps */}
+  1514→      <div className="px-4 mb-6">
+  1515→        <h3 className="text-sm font-semibold mb-3">Connected</h3>
+  1516→        {DAPP_CONNECTIONS.map((dapp) => (
+  1517→          <div key={dapp.id} className="glass-card rounded-xl p-3.5 flex items-center gap-3 mb-2">
+  1518→            <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-xl">{dapp.icon}</div>
+  1519→            <div className="flex-1 min-w-0">
+  1520→              <p className="text-sm font-medium">{dapp.name}</p>
+  1521→              <p className="text-xs text-muted-foreground truncate">{dapp.domain} · {dapp.lastUsed}</p>
+  1522→            </div>
+  1523→            <Badge variant="outline" className="border-gcrm-green/30 text-gcrm-green text-xs">Active</Badge>
+  1524→          </div>
+  1525→        ))}
+  1526→      </div>
+  1527→
+  1528→      {/* Popular DApps */}
+  1529→      <div className="px-4">
+  1530→        <h3 className="text-sm font-semibold mb-3">Popular DApps</h3>
+  1531→        <div className="grid grid-cols-3 gap-3">
+  1532→          {popularDApps.map((dapp, i) => (
+  1533→            <motion.button
+  1534→              key={dapp.name}
+  1535→              initial={{ opacity: 0, scale: 0.95 }}
+  1536→              animate={{ opacity: 1, scale: 1 }}
+  1537→              transition={{ delay: i * 0.05 }}
+  1538→              onClick={() => addToast(`Opening ${dapp.name}...`, 'info')}
+  1539→              className="glass-card rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-white/[0.03] transition-colors"
+  1540→            >
+  1541→              <span className="text-2xl">{dapp.icon}</span>
+  1542→              <span className="text-xs font-medium text-center">{dapp.name}</span>
+  1543→              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{dapp.chain}</Badge>
+  1544→            </motion.button>
+  1545→          ))}
+  1546→        </div>
+  1547→      </div>
+  1548→
+  1549→      {/* DApp Browser placeholder */}
+  1550→      <div className="px-4 mt-6">
+  1551→        <div className="glass-card rounded-xl p-6 flex flex-col items-center text-center">
+  1552→          <Globe className="size-10 text-muted-foreground mb-3" />
+  1553→          <p className="text-sm font-medium mb-1">DApp Browser</p>
+  1554→          <p className="text-xs text-muted-foreground mb-4">Browse and interact with decentralized applications directly from your wallet</p>
+  1555→          <button
+  1556→            onClick={() => addToast('DApp browser coming soon!', 'info')}
+  1557→            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary hover:bg-white/5 transition-colors text-sm text-primary"
+  1558→          >
+  1559→            <ExternalLink className="size-3.5" />
+  1560→            Enter URL
+  1561→          </button>
+  1562→        </div>
+  1563→      </div>
+  1564→    </motion.div>
+  1565→  );
+  1566→}
+  1567→
+  1568→// ─── Settings Screen ─────────────────────────────────────────────────
+  1569→function SettingsScreen() {
+  1570→  const navigate = useWalletStore((s) => s.navigate);
+  1571→  const address = useWalletStore((s) => s.address);
+  1572→  const resetWallet = useWalletStore((s) => s.resetWallet);
+  1573→  const lockWallet = useWalletStore((s) => s.lockWallet);
+  1574→  const addToast = useWalletStore((s) => s.addToast);
+  1575→
+  1576→  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  1577→
+  1578→  const settingsGroups = [
+  1579→    {
+  1580→      title: 'Security',
+  1581→      items: [
+  1582→        { icon: Lock, label: 'Change Password', action: () => addToast('Password change coming soon', 'info') },
+  1583→        { icon: Fingerprint, label: 'Biometric Login', action: () => addToast('Biometric setup coming soon', 'info'), trailing: 'Off' },
+  1584→        { icon: Key, label: 'Auto-Lock Timer', action: () => addToast('Auto-lock settings coming soon', 'info'), trailing: '5 min' },
+  1585→      ],
+  1586→    },
+  1587→    {
+  1588→      title: 'Networks',
+  1589→      items: [
+  1590→        { icon: Globe, label: 'Manage Networks', action: () => navigate('networks' as Screen) },
+  1591→        { icon: RefreshCw, label: 'Default Network', action: () => {}, trailing: 'Ethereum' },
+  1592→      ],
+  1593→    },
+  1594→    {
+  1595→      title: 'Wallet',
+  1596→      items: [
+  1597→        { icon: Eye, label: 'Show Recovery Phrase', action: () => addToast('This feature requires re-authentication', 'info') },
+  1598→        { icon: CopyIcon, label: 'Copy Address', action: () => {
+  1599→          navigator.clipboard.writeText(address);
+  1600→          addToast('Address copied!', 'success');
+  1601→        }},
+  1602→        { icon: ExternalLink, label: 'View on Explorer', action: () => addToast('Opening explorer...', 'info') },
+  1603→      ],
+  1604→    },
+  1605→    {
+  1606→      title: 'Privacy',
+  1607→      items: [
+  1608→        { icon: Moon, label: 'Dark Mode', action: () => {}, trailing: 'Always On' },
+  1609→        { icon: EyeOff, label: 'Hide Balances', action: () => addToast('Toggle in dashboard', 'info') },
+  1610→      ],
+  1611→    },
+  1612→  ];
+  1613→
+  1614→  return (
+  1615→    <motion.div key="settings" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="min-h-screen pb-24">
+  1616→      <div className="px-4 pt-4 pb-4">
+  1617→        <h1 className="text-lg font-semibold">Settings</h1>
+  1618→      </div>
+  1619→
+  1620→      <div className="px-4 flex flex-col gap-6">
+  1621→        {settingsGroups.map((group) => (
+  1622→          <div key={group.title}>
+  1623→            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 px-1">{group.title}</p>
+  1624→            <div className="glass-card rounded-xl overflow-hidden divide-y divide-border">
+  1625→              {group.items.map((item) => (
+  1626→                <button
+  1627→                  key={item.label}
+  1628→                  onClick={item.action}
+  1629→                  className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-white/[0.03] transition-colors text-left"
+  1630→                >
+  1631→                  <item.icon className="size-4 text-muted-foreground" />
+  1632→                  <span className="text-sm flex-1">{item.label}</span>
+  1633→                  {item.trailing && <span className="text-xs text-muted-foreground">{item.trailing}</span>}\n                  <ChevronRight className="size-4 text-muted-foreground" />
+  1634→                </button>
+  1635→              ))}
+  1636→            </div>
+  1637→          </div>
+  1638→        ))}
+  1639→
+  1640→        {/* Danger zone */}
+  1641→        <div>
+  1642→          <p className="text-xs text-gcrm-red uppercase tracking-wider mb-2 px-1">Danger Zone</p>
+  1643→          <div className="glass-card rounded-xl overflow-hidden divide-y divide-border">
+  1644→            <button
+  1645→              onClick={lockWallet}
+  1646→              className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-white/[0.03] transition-colors text-left"
+  1647→            >
+  1648→              <Lock className="size-4 text-gcrm-red" />
+  1649→              <span className="text-sm flex-1">Lock Wallet</span>
+  1650→            </button>
+  1651→            <button
+  1652→              onClick={() => setShowResetConfirm(true)}
+  1653→              className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-gcrm-red/5 transition-colors text-left"
+  1654→            >
+  1655→              <AlertTriangle className="size-4 text-gcrm-red" />
+  1656→              <span className="text-sm text-gcrm-red flex-1">Reset Wallet</span>
+  1657→            </button>
+  1658→          </div>
+  1659→        </div>
+  1660→
+  1661→        {/* App info */}
+  1662→        <div className="text-center py-4">
+  1663→          <div className="w-8 h-8 rounded-lg gold-gradient flex items-center justify-center mx-auto mb-2">
+  1664→            <span className="text-black text-xs font-bold">◆</span>
+  1665→          </div>
+  1666→          <p className="text-xs text-muted-foreground">GCRM Wallet v1.0.0</p>
+  1667→          <p className="text-[10px] text-muted-foreground mt-1">Secure. Non-Custodial. Multichain.</p>
+  1668→        </div>
+  1669→      </div>
+  1670→
+  1671→      {/* Reset confirmation dialog */}
+  1672→      <AnimatePresence>
+  1673→        {showResetConfirm && (
+  1674→          <motion.div
+  1675→            initial={{ opacity: 0 }}
+  1676→            animate={{ opacity: 1 }}
+  1677→            exit={{ opacity: 0 }}
+  1678→            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+  1679→            onClick={() => setShowResetConfirm(false)}
+  1680→          >
+  1681→            <motion.div
+  1682→              initial={{ scale: 0.95, opacity: 0 }}
+  1683→              animate={{ scale: 1, opacity: 1 }}
+  1684→              exit={{ scale: 0.95, opacity: 0 }}
+  1685→              className="glass-card rounded-2xl p-6 w-full max-w-sm"
+  1686→              onClick={(e) => e.stopPropagation()}
+  1687→            >
+  1688→              <div className="w-12 h-12 rounded-xl bg-gcrm-red/10 flex items-center justify-center mx-auto mb-4">
+  1689→                <AlertTriangle className="size-6 text-gcrm-red" />
+  1690→              </div>
+  1691→              <h3 className="text-lg font-semibold text-center mb-2">Reset Wallet?</h3>
+  1692→              <p className="text-sm text-muted-foreground text-center mb-6">
+  1693→                This will delete all wallet data from this device. Make sure you have your recovery phrase backed up.
+  1694→              </p>
+  1695→              <div className="flex gap-3">
+  1696→                <button
+  1697→                  onClick={() => setShowResetConfirm(false)}
+  1698→                  className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-white/5 transition-colors"
+  1699→                >
+  1700→                  Cancel
+  1701→                </button>
+  1702→                <button
+  1703→                  onClick={() => { resetWallet(); addToast('Wallet has been reset', 'info'); }}
+  1704→                  className="flex-1 h-10 rounded-xl bg-gcrm-red text-white text-sm font-medium hover:bg-gcrm-red/90 transition-colors"
+  1705→                >
+  1706→                  Reset
+  1707→                </button>
+  1708→              </div>
+  1709→            </motion.div>
+  1710→          </motion.div>
+  1711→        )}
+  1712→      </AnimatePresence>
+  1713→    </motion.div>
+  1714→  );
+  1715→}
+  1716→
+  1717→// ─── Wallet Lock Screen ──────────────────────────────────────────────
+  1718→function WalletLockScreen() {
+  1719→  const unlockWallet = useWalletStore((s) => s.unlockWallet);
+  1720→  const address = useWalletStore((s) => s.address);
+  1721→  const addToast = useWalletStore((s) => s.addToast);
+  1722→
+  1723→  const [password, setPassword] = useState('');
+  1724→  const [showPassword, setShowPassword] = useState(false);
+  1725→  const [isUnlocking, setIsUnlocking] = useState(false);
+  1726→
+  1727→  const handleUnlock = useCallback(async () => {
+  1728→    if (password.length < 1) {
+  1729→      addToast('Enter your password', 'error');
+  1730→      return;
+  1731→    }
+  1732→    setIsUnlocking(true);
+  1733→    // Simulate unlock - in production this would decrypt the wallet
+  1734→    setTimeout(() => {
+  1735→      unlockWallet();
+  1736→      addToast('Wallet unlocked!', 'success');
+  1737→      setIsUnlocking(false);
+  1738→    }, 800);
+  1739→  }, [password, unlockWallet, addToast]);
+  1740→
+  1741→  return (
+  1742→    <motion.div
+  1743→      key="lock"
+  1744→      initial={{ opacity: 0 }}
+  1745→      animate={{ opacity: 1 }}
+  1746→      className="min-h-screen flex flex-col items-center justify-center px-6"
+  1747→    >
+  1748→      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-primary/5 blur-[80px]" />
+  1749→
+  1750→      <motion.div
+  1751→        initial={{ scale: 0.8, opacity: 0 }}
+  1752→        animate={{ scale: 1, opacity: 1 }}
+  1753→        transition={{ delay: 0.1 }}
+  1754→        className="w-20 h-20 rounded-3xl gold-gradient flex items-center justify-center gcrm-glow mb-8"
+  1755→      >
+  1756→        <Lock className="size-8 text-black" />
+  1757→      </motion.div>
+  1758→
+  1759→      <motion.h1
+  1760→        initial={{ y: 10, opacity: 0 }}
+  1761→        animate={{ y: 0, opacity: 1 }}
+  1762→        transition={{ delay: 0.2 }}
+  1763→        className="text-xl font-semibold mb-1"
+  1764→      >
+  1765→        Wallet Locked
+  1766→      </motion.h1>
+  1767→      <motion.p
+  1768→        initial={{ y: 10, opacity: 0 }}
+  1769→        animate={{ y: 0, opacity: 1 }}
+  1770→        transition={{ delay: 0.25 }}
+  1771→        className="text-sm text-muted-foreground mb-8 text-center"
+  1772→      >
+  1773→        {address ? truncateAddress(address) : 'GCRM Wallet'}
+  1774→      </motion.p>
+  1775→
+  1776→      <motion.div
+  1777→        initial={{ y: 20, opacity: 0 }}
+  1778→        animate={{ y: 0, opacity: 1 }}
+  1779→        transition={{ delay: 0.3 }}
+  1780→        className="w-full max-w-xs"
+  1781→      >
+  1782→        <div className="relative mb-4">
+  1783→          <Input
+  1784→            type={showPassword ? 'text' : 'password'}
+  1785→            placeholder="Enter password"
+  1786→            value={password}
+  1787→            onChange={(e) => setPassword(e.target.value)}
+  1788→            onKeyDown={(e) => e.key === 'Enter' && handleUnlock()}
+  1789→            className="h-12 pr-10 text-base"
+  1790→            autoFocus
+  1791→          />
+  1792→          <button onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+  1793→            {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+  1794→          </button>
+  1795→        </div>
+  1796→        <button
+  1797→          onClick={handleUnlock}
+  1798→          disabled={isUnlocking}
+  1799→          className="w-full h-12 rounded-xl gold-gradient text-black font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+  1800→        >
+  1801→          {isUnlocking ? 'Unlocking...' : 'Unlock'}
+  1802→        </button>
+  1803→      </motion.div>
+  1804→    </motion.div>
+  1805→  );
+  1806→}
+  1807→
+  1808→// ─── Networks Screen ─────────────────────────────────────────────────
+  1809→function NetworksScreen() {
+  1810→  const navigate = useWalletStore((s) => s.navigate);
+  1811→  const currentChainId = useWalletStore((s) => s.currentChainId);
+  1812→  const selectChain = useWalletStore((s) => s.selectChain);
+  1813→  const addToast = useWalletStore((s) => s.addToast);
+  1814→
+  1815→  return (
+  1816→    <motion.div key="networks" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="min-h-screen flex flex-col">
+  1817→      <ScreenHeader title="Networks" onBack={() => navigate('settings')} />
+  1818→      <div className="flex-1 px-4 pb-8 overflow-y-auto">
+  1819→        <p className="text-xs text-muted-foreground mb-3">Select a network to switch to</p>
+  1820→        <div className="flex flex-col gap-2">
+  1821→          {SUPPORTED_CHAINS.map((chain, i) => (
+  1822→            <motion.button
+  1823→              key={chain.id}
+  1824→              initial={{ opacity: 0, x: -10 }}
+  1825→              animate={{ opacity: 1, x: 0 }}
+  1826→              transition={{ delay: i * 0.05 }}
+  1827→              onClick={() => { selectChain(chain.id); addToast(`Switched to ${chain.name}`, 'success'); }}
+  1828→              className={`glass-card rounded-xl p-4 flex items-center gap-3 transition-colors ${
+  1829→                chain.id === currentChainId ? 'border-primary/30' : 'hover:bg-white/[0.03]'
+  1830→              }`}
+  1831→            >
+  1832→              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{ backgroundColor: chain.color + '15', color: chain.color }}>
+  1833→                {chain.icon}
+  1834→              </div>
+  1835→              <div className="flex-1 text-left">
+  1836→                <p className="text-sm font-medium">{chain.name}</p>
+  1837→                <p className="text-xs text-muted-foreground">Chain ID: {chain.id}</p>
+  1838→              </div>
+  1839→              {chain.id === currentChainId && (
+  1840→                <Badge className="bg-primary/10 text-primary border-primary/20">Active</Badge>
+  1841→              )}
+  1842→            </motion.button>
+  1843→          ))}
+  1844→        </div>
+  1845→      </div>
+  1846→    </motion.div>
+  1847→  );
+  1848→}
+  1849→
+  1850→// ─── Copy Button Helper ──────────────────────────────────────────────
+  1851→function CopyButton({ text }: { text: string }) {
+  1852→  const [copied, setCopied] = useState(false);
+  1853→  const addToast = useWalletStore((s) => s.addToast);
+  1854→
+  1855→  const handleCopy = useCallback(() => {
+  1856→    navigator.clipboard.writeText(text);
+  1857→    setCopied(true);
+  1858→    addToast('Copied!', 'success');
+  1859→    setTimeout(() => setCopied(false), 2000);
+  1860→  }, [text, addToast]);
+  1861→
+  1862→  return (
+  1863→    <button onClick={handleCopy} className="p-1 rounded hover:bg-white/5 transition-colors">
+  1864→      {copied ? <Check className="size-3.5 text-gcrm-green" /> : <CopyIcon className="size-3.5 text-muted-foreground" />}
+  1865→    </button>
+  1866→  );
+  1867→}
+  1868→
+  1869→// ─── Bottom Navigation ───────────────────────────────────────────────
+  1870→function BottomNav() {
+  1871→  const navigate = useWalletStore((s) => s.navigate);
+  1872→  const currentScreen = useWalletStore((s) => s.currentScreen);
+  1873→  const [showMore, setShowMore] = useState(false);
+  1874→
+  1875→  const navItems = [
+  1876→    { icon: HomeIcon, label: 'Inicio', screen: 'dashboard' as Screen },
+  1877→    { icon: Wallet, label: 'Wallet', screen: 'wallet' as Screen },
+  1878→    { icon: ArrowLeftRight, label: 'Swap', screen: 'swap' as Screen },
+  1879→    { icon: TrendingUp, label: 'Staking', screen: 'staking' as Screen },
+  1880→    { icon: Globe, label: 'DApps', screen: 'dapps' as Screen },
+  1881→  ];
+  1882→
+  1883→  const isActive = (screen: Screen) => currentScreen === screen;
+  1884→
+  1885→  return (
+  1886→    <>
+  1887→      <nav className="fixed bottom-0 left-0 right-0 z-40">
+  1888→        <div className="max-w-md lg:max-w-lg mx-auto">
+  1889→          <div className="mx-2 mb-2 rounded-2xl glass-card border-t border-border/50">
+  1890→            <div className="flex items-center justify-around py-2">
+  1891→              {navItems.map((item) => (
+  1892→                <button
+  1893→                  key={item.screen}
+  1894→                  onClick={() => navigate(item.screen)}
+  1895→                  className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-colors min-w-[56px] ${
+  1896→                    isActive(item.screen) ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+  1897→                  }`}
+  1898→                >
+  1899→                  <item.icon className={`size-5 ${isActive(item.screen) ? 'text-primary' : ''}`} />
+  1900→                  <span className="text-[10px] font-medium">{item.label}</span>
+  1901→                  {isActive(item.screen) && (
+  1902→                    <motion.div layoutId="nav-indicator" className="w-1 h-1 rounded-full bg-primary" />
+  1903→                  )}
+  1904→                </button>
+  1905→              ))}
+  1906→
+  1907→              {/* More menu (Settings) */}
+  1908→              <div className="relative">
+  1909→                <button
+  1910→                  onClick={() => setShowMore(!showMore)}
+  1911→                  className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition-colors min-w-[56px] ${
+  1912→                    isActive('settings') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+  1913→                  }`}
+  1914→                >
+  1915→                  <Menu className="size-5" />
+  1916→                  <span className="text-[10px] font-medium">More</span>
+  1917→                </button>
+  1918→
+  1919→                <AnimatePresence>
+  1920→                  {showMore && (
+  1921→                    <motion.div
+  1922→                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+  1923→                      animate={{ opacity: 1, y: 0, scale: 1 }}
+  1924→                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+  1925→                      className="absolute bottom-full right-0 mb-2 w-48 glass-card rounded-xl overflow-hidden"
+  1926→                    >
+  1927→                      <button
+  1928→                        onClick={() => { navigate('settings'); setShowMore(false); }}
+  1929→                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left"
+  1930→                      >
+  1931→                        <Settings className="size-4 text-muted-foreground" />
+  1932→                        <span className="text-sm">Settings</span>
+  1933→                      </button>
+  1934→                      <button
+  1935→                        onClick={() => { navigate('networks' as Screen); setShowMore(false); }}
+  1936→                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left"
+  1937→                      >
+  1938→                        <Globe className="size-4 text-muted-foreground" />
+  1939→                        <span className="text-sm">Networks</span>
+  1940→                      </button>
+  1941→                      <button
+  1942→                        onClick={() => setShowMore(false)}
+  1943→                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left"
+  1944→                      >
+  1945→                        <Shield className="size-4 text-muted-foreground" />
+  1946→                        <span className="text-sm">Security</span>
+  1947→                      </button>
+  1948→                    </motion.div>
+  1949→                  )}
+  1950→                </AnimatePresence>
+  1951→              </div>
+  1952→            </div>
+  1953→          </div>
+  1954→        </div>
+  1955→      </nav>
+  1956→      {/* Click-away for more menu */}
+  1957→      {showMore && <div className="fixed inset-0 z-30" onClick={() => setShowMore(false)} />}
+  1958→    </>
+  1959→  );
+  1960→}
+  1961→
+  1962→// ─── Wallet Screen (token list view) ─────────────────────────────────
+  1963→function WalletScreen() {
+  1964→  const navigate = useWalletStore((s) => s.navigate);
+  1965→  const currentChainId = useWalletStore((s) => s.currentChainId);
+  1966→  const selectChain = useWalletStore((s) => s.selectChain);
+  1967→  const chain = getChainById(currentChainId);
+  1968→  const [balanceHidden, setBalanceHidden] = useState(false);
+  1969→
+  1970→  return (
+  1971→    <motion.div key="wallet" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="min-h-screen pb-24">
+  1972→      <div className="px-4 pt-4 pb-2 flex items-center justify-between">
+  1973→        <h1 className="text-lg font-semibold">Wallet</h1>
+  1974→        <div className="flex items-center gap-2">
+  1975→          <button onClick={() => setBalanceHidden(!balanceHidden)} className="p-2 rounded-lg hover:bg-white/5">
+  1976→            {balanceHidden ? <EyeOff className="size-4 text-muted-foreground" /> : <Eye className="size-4 text-muted-foreground" />}
+  1977→          </button>
+  1978→          <button className="p-2 rounded-lg hover:bg-white/5">
+  1979→            <Plus className="size-4 text-primary" />
+  1980→          </button>
+  1981→        </div>
+  1982→      </div>
+  1983→
+  1984→      {/* Chain filter */}
+  1985→      <div className="px-4 mb-4">
+  1986→        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
+  1987→          <button
+  1988→            onClick={() => selectChain(currentChainId)}
+  1989→            className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-black text-xs font-medium"
+  1990→          >
+  1991→            {chain?.icon} {chain?.name}
+  1992→          </button>
+  1993→          {SUPPORTED_CHAINS.filter((c) => c.id !== currentChainId).map((c) => (
+  1994→            <button
+  1995→              key={c.id}
+  1996→              onClick={() => selectChain(c.id)}
+  1997→              className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary text-muted-foreground text-xs hover:text-foreground transition-colors"
+  1998→            >
+  1999→              {c.icon} {c.symbol}
+  2000→            </button>
+  2001→          ))}
+  2002→        </div>
+  2003→      </div>
+  2004→
+  2005→      {/* Total balance */}
+  2006→      <div className="px-4 mb-4">
+  2007→        <p className="text-3xl font-bold mb-1">
+  2008→          {balanceHidden ? '••••••' : '$4,001.10'}
+  2009→        </p>
+  2010→        <p className="text-xs text-muted-foreground">Total balance on {chain?.name}</p>
+  2011→      </div>
+  2012→
+  2013→      {/* Token list */}
+  2014→      <div className="px-4">
+  2015→        <div className="flex flex-col gap-2">
+  2016→          {DEMO_TOKENS.map((token, i) => (
+  2017→            <motion.div
+  2018→              key={token.symbol}
+  2019→              initial={{ opacity: 0, y: 5 }}
+  2020→              animate={{ opacity: 1, y: 0 }}
+  2021→              transition={{ delay: i * 0.05 }}
+  2022→              className="glass-card rounded-xl p-4 flex items-center justify-between cursor-pointer hover:bg-white/[0.03] transition-colors"
+  2023→            >
+  2024→              <div className="flex items-center gap-3">
+  2025→                <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold ${
+  2026→                  token.symbol === 'GCRM' ? 'gold-gradient text-black' : 'bg-secondary text-muted-foreground'
+  2027→                }`}>
+  2028→                  {token.symbol === 'GCRM' ? 'G' : token.symbol.charAt(0)}
+  2029→                </div>
+  2030→                <div>
+  2031→                  <p className="text-sm font-semibold">{token.symbol}</p>
+  2032→                  <p className="text-xs text-muted-foreground">{token.name}</p>
+  2033→                </div>
+  2034→              </div>
+  2035→              <div className="text-right">
+  2036→                <p className="text-sm font-semibold">{balanceHidden ? '••••' : token.balance}</p>
+  2037→                <p className={`text-xs ${token.change24h >= 0 ? 'text-gcrm-green' : 'text-gcrm-red'}`}>
+  2038→                  {balanceHidden ? '' : `$${token.valueUsd.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
+  2039→                </p>
+  2040→              </div>
+  2041→            </motion.div>
+  2042→          ))}
+  2043→        </div>
+  2044→
+  2045→        <div className="mt-3 flex items-center gap-1.5 justify-center">
+  2046→          <Info className="size-3 text-muted-foreground" />
+  2047→          <p className="text-xs text-muted-foreground">Demo data — connect to view real balances</p>
+  2048→        </div>
+  2049→      </div>
+  2050→    </motion.div>
+  2051→  );
+  2052→}
+  2053→
+  2054→// ─── Main GCRM Wallet Component ──────────────────────────────────────
+  2055→function GCRMWallet() {
+  2056→  const currentScreen = useWalletStore((s) => s.currentScreen);
+  2057→  const isWalletCreated = useWalletStore((s) => s.isWalletCreated);
+  2058→  const isWalletLocked = useWalletStore((s) => s.isWalletLocked);
+  2059→  const showOnboarding = useWalletStore((s) => s.showOnboarding);
+  2060→  const initialize = useWalletStore((s) => s.initialize);
+  2061→
+  2062→  useEffect(() => {
+  2063→    initialize();
+  2064→  }, [initialize]);
+  2065→
+  2066→  const showNav = isWalletCreated && !isWalletLocked && !['create-wallet', 'import-wallet', 'seed-verify'].includes(currentScreen);
+  2067→
+  2068→  const renderScreen = () => {
+  2069→    // Lock screen
+  2070→    if (isWalletCreated && isWalletLocked) {
+  2071→      return <WalletLockScreen />;
+  2072→    }
+  2073→
+  2074→    // Onboarding
+  2075→    if (showOnboarding && !isWalletCreated) {
+  2076→      return <OnboardingScreen />;
+  2077→    }
+  2078→
+  2079→    switch (currentScreen) {
+  2080→      case 'create-wallet':
+  2081→        return <CreateWalletScreen />;
+  2082→      case 'import-wallet':
+  2083→        return <ImportWalletScreen />;
+  2084→      case 'dashboard':
+  2085→        return <DashboardScreen />;
+  2086→      case 'send':
+  2087→        return <SendScreen />;
+  2088→      case 'receive':
+  2089→        return <ReceiveScreen />;
+  2090→      case 'swap':
+  2091→        return <SwapScreen />;
+  2092→      case 'staking':
+  2093→        return <StakingScreen />;
+  2094→      case 'dapps':
+  2095→        return <DAppsScreen />;
+  2096→      case 'settings':
+  2097→        return <SettingsScreen />;
+  2098→      case 'wallet':
+  2099→        return <WalletScreen />;
+  2100→      case 'networks':
+  2101→        return <NetworksScreen />;
+  2102→      default:
+  2103→        return <DashboardScreen />;
+  2104→    }
+  2105→  };
+  2106→
+  2107→  return (
+  2108→    <div className="min-h-screen bg-background max-w-md lg:max-w-lg mx-auto relative">
+  2109→      <ToastContainer />
+  2110→      <AnimatePresence mode="wait">
+  2111→        {renderScreen()}
+  2112→      </AnimatePresence>
+  2113→      {showNav && <BottomNav />}
+  2114→    </div>
+  2115→  );
+  2116→}
+  2117→
+  2118→export default function Home() {
+  2119→  return <GCRMWallet />;
+  2120→}
+  2121→
