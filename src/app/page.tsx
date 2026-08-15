@@ -13,7 +13,7 @@ import {
 } from '@/lib/wallet/core';
 import { SUPPORTED_CHAINS, getChainById, getExplorerUrl } from '@/lib/wallet/chains';
 import { STAKING_POOLS, calculateStakingRewards, formatAPY, formatTVL } from '@/lib/wallet/staking';
-import { NATIVE_TOKENS, GCRM_TOKEN, GCRM_ECOSYSTEM_TOKENS, POPULAR_TOKENS, getAvailableTokens } from '@/lib/wallet/tokens';
+import { NATIVE_TOKENS, GCRM_TOKEN, QFS_TOKEN, GCRM_ECOSYSTEM_TOKENS, POPULAR_TOKENS, getAvailableTokens } from '@/lib/wallet/tokens';
 import type { Screen } from '@/types/wallet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -813,9 +813,9 @@ function DashboardScreen() {
             >
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold overflow-hidden ${
-                  token.symbol === 'GCRM' ? '' : 'bg-secondary text-muted-foreground'
+                  token.symbol === 'GCRM' || token.symbol === 'QFS' ? '' : 'bg-secondary text-muted-foreground'
                 }`}>
-                  {token.symbol === 'GCRM' ? <img src="/gcrm-token-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : token.symbol.charAt(0)}
+                  {token.symbol === 'GCRM' ? <img src="/gcrm-token-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : token.symbol === 'QFS' ? <img src="/qfs-token-logo.png" alt="QFS" className="w-full h-full object-cover" /> : token.symbol.charAt(0)}
                 </div>
                 <div>
                   <p className="text-sm font-medium">{token.symbol}</p>
@@ -1189,7 +1189,7 @@ function SwapScreen() {
                   />
                   <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary hover:bg-white/5 transition-colors shrink-0">
                     <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden ${fromToken === 'GCRM' ? '' : 'bg-blue-500/20 text-blue-400'}`}>
-                      {fromToken === 'GCRM' ? <img src="/gcrm-token-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : fromToken.charAt(0)}
+                      {fromToken === 'GCRM' ? <img src="/gcrm-token-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : fromToken === 'QFS' ? <img src="/qfs-token-logo.png" alt="QFS" className="w-full h-full object-cover" /> : fromToken.charAt(0)}
                     </span>
                     <span className="text-sm font-medium">{fromToken}</span>
                   </button>
@@ -1222,7 +1222,7 @@ function SwapScreen() {
                   />
                   <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary hover:bg-white/5 transition-colors shrink-0">
                     <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden ${toToken === 'GCRM' ? '' : 'bg-blue-500/20 text-blue-400'}`}>
-                      {toToken === 'GCRM' ? <img src="/gcrm-token-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : toToken.charAt(0)}
+                      {toToken === 'GCRM' ? <img src="/gcrm-token-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : toToken === 'QFS' ? <img src="/qfs-token-logo.png" alt="QFS" className="w-full h-full object-cover" /> : toToken.charAt(0)}
                     </span>
                     <span className="text-sm font-medium">{toToken}</span>
                   </button>
@@ -2071,8 +2071,8 @@ function AddTokenModal({ chainId, onClose }: { chainId: number; onClose: () => v
             <div className="flex flex-col gap-1.5">
               {filteredTokens.map((token) => (
                 <div key={token.address + token.symbol} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.03] transition-colors">
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${token.symbol === 'GCRM' ? 'overflow-hidden' : 'bg-secondary text-muted-foreground'}`}>
-                    {token.symbol === 'GCRM' ? <img src="/gcrm-token-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : token.symbol.charAt(0)}
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${token.symbol === 'GCRM' || token.symbol === 'QFS' ? 'overflow-hidden' : 'bg-secondary text-muted-foreground'}`}>
+                    {token.symbol === 'GCRM' ? <img src="/gcrm-token-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : token.symbol === 'QFS' ? <img src="/qfs-token-logo.png" alt="QFS" className="w-full h-full object-cover" /> : token.symbol.charAt(0)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">{token.symbol}</p>
@@ -2139,6 +2139,8 @@ function WalletScreen() {
     if (native) tokens.push({ ...native, balance: currentChainId === 1 ? '0.4521' : currentChainId === 56 ? '3.2100' : currentChainId === 101 ? '2.5000' : '0.0000', valueUsd: currentChainId === 1 ? 1478.50 : currentChainId === 56 ? 891.40 : currentChainId === 101 ? 350.00 : 0, change24h: 0 });
     const gcrm = GCRM_TOKEN[currentChainId];
     if (gcrm) tokens.push({ ...gcrm, balance: '12,580.00', valueUsd: 1132.20, change24h: 4.2 });
+    const qfs = QFS_TOKEN[currentChainId];
+    if (qfs) tokens.push({ ...qfs, balance: '0.00', valueUsd: 0, change24h: 0 });
     const ecosystem = GCRM_ECOSYSTEM_TOKENS[currentChainId] || [];
     ecosystem.forEach((t) => tokens.push({ ...t, balance: '0.00', valueUsd: 0, change24h: 0 }));
     const popular = POPULAR_TOKENS[currentChainId] || [];
@@ -2195,8 +2197,8 @@ function WalletScreen() {
               className="glass-card rounded-xl p-4 flex items-center justify-between cursor-pointer hover:bg-white/[0.03] transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold ${token.symbol === 'GCRM' ? 'overflow-hidden' : 'bg-secondary text-muted-foreground'}`}>
-                  {token.symbol === 'GCRM' ? <img src="/gcrm-token-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : token.symbol.charAt(0)}
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold ${token.symbol === 'GCRM' || token.symbol === 'QFS' ? 'overflow-hidden' : 'bg-secondary text-muted-foreground'}`}>
+                  {token.symbol === 'GCRM' ? <img src="/gcrm-token-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : token.symbol === 'QFS' ? <img src="/qfs-token-logo.png" alt="QFS" className="w-full h-full object-cover" /> : token.symbol.charAt(0)}
                 </div>
                 <div>
                   <p className="text-sm font-semibold">{token.symbol}</p>

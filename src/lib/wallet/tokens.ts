@@ -56,36 +56,76 @@ export const GCRM_TOKEN: Record<number, Omit<Token, 'balance' | 'valueUsd'>> = {
   },
 };
 
-// Custom GCRM Ecosystem Tokens
+// QFS Token - QFSpay
+export const QFS_TOKEN: Record<number, Omit<Token, 'balance' | 'valueUsd'>> = {
+  1: {
+    symbol: 'QFS',
+    name: 'QFSpay',
+    address: process.env.NEXT_PUBLIC_QFS_ADDRESS_ETH || '0x7c670a7eba354e0d22f0ecbbe7a36bf10dce305e',
+    decimals: 18,
+    chainId: 1,
+  },
+  56: {
+    symbol: 'QFS',
+    name: 'QFSpay',
+    address: process.env.NEXT_PUBLIC_QFS_ADDRESS_BSC || '0x0000000000000000000000000000000000000000',
+    decimals: 18,
+    chainId: 56,
+  },
+  137: {
+    symbol: 'QFS',
+    name: 'QFSpay',
+    address: process.env.NEXT_PUBLIC_QFS_ADDRESS_POLYGON || '0x0000000000000000000000000000000000000000',
+    decimals: 18,
+    chainId: 137,
+  },
+  101: {
+    symbol: 'QFS',
+    name: 'QFSpay',
+    address: process.env.NEXT_PUBLIC_QFS_ADDRESS_SOLANA || 'QFSToken111111111111111111111111111111',
+    decimals: 9,
+    chainId: 101,
+  },
+  42161: {
+    symbol: 'QFS',
+    name: 'QFSpay',
+    address: process.env.NEXT_PUBLIC_QFS_ADDRESS_ARB || '0x0000000000000000000000000000000000000000',
+    decimals: 18,
+    chainId: 42161,
+  },
+  8453: {
+    symbol: 'QFS',
+    name: 'QFSpay',
+    address: process.env.NEXT_PUBLIC_QFS_ADDRESS_BASE || '0x0000000000000000000000000000000000000000',
+    decimals: 18,
+    chainId: 8453,
+  },
+};
+
+// Custom GCRM Ecosystem Tokens (NESG, Ala)
 export const GCRM_ECOSYSTEM_TOKENS: Record<number, Omit<Token, 'balance' | 'valueUsd'>[]> = {
   1: [
     { symbol: 'NESG', name: 'NESG Token', address: '0x0000000000000000000000000000000000000001', decimals: 18, chainId: 1 },
-    { symbol: 'QFS', name: 'QFS Token', address: '0x0000000000000000000000000000000000000002', decimals: 18, chainId: 1 },
     { symbol: 'Ala', name: 'Ala Token', address: '0x0000000000000000000000000000000000000003', decimals: 18, chainId: 1 },
   ],
   56: [
     { symbol: 'NESG', name: 'NESG Token', address: '0x0000000000000000000000000000000000000001', decimals: 18, chainId: 56 },
-    { symbol: 'QFS', name: 'QFS Token', address: '0x0000000000000000000000000000000000000002', decimals: 18, chainId: 56 },
     { symbol: 'Ala', name: 'Ala Token', address: '0x0000000000000000000000000000000000000003', decimals: 18, chainId: 56 },
   ],
   137: [
     { symbol: 'NESG', name: 'NESG Token', address: '0x0000000000000000000000000000000000000001', decimals: 18, chainId: 137 },
-    { symbol: 'QFS', name: 'QFS Token', address: '0x0000000000000000000000000000000000000002', decimals: 18, chainId: 137 },
     { symbol: 'Ala', name: 'Ala Token', address: '0x0000000000000000000000000000000000000003', decimals: 18, chainId: 137 },
   ],
   101: [
     { symbol: 'NESG', name: 'NESG Token', address: 'NESGToken1111111111111111111111111111', decimals: 9, chainId: 101 },
-    { symbol: 'QFS', name: 'QFS Token', address: 'QFSToken111111111111111111111111111111', decimals: 9, chainId: 101 },
     { symbol: 'Ala', name: 'Ala Token', address: 'AlaToken1111111111111111111111111111111', decimals: 9, chainId: 101 },
   ],
   42161: [
     { symbol: 'NESG', name: 'NESG Token', address: '0x0000000000000000000000000000000000000001', decimals: 18, chainId: 42161 },
-    { symbol: 'QFS', name: 'QFS Token', address: '0x0000000000000000000000000000000000000002', decimals: 18, chainId: 42161 },
     { symbol: 'Ala', name: 'Ala Token', address: '0x0000000000000000000000000000000000000003', decimals: 18, chainId: 42161 },
   ],
   8453: [
     { symbol: 'NESG', name: 'NESG Token', address: '0x0000000000000000000000000000000000000001', decimals: 18, chainId: 8453 },
-    { symbol: 'QFS', name: 'QFS Token', address: '0x0000000000000000000000000000000000000002', decimals: 18, chainId: 8453 },
     { symbol: 'Ala', name: 'Ala Token', address: '0x0000000000000000000000000000000000000003', decimals: 18, chainId: 8453 },
   ],
 };
@@ -113,13 +153,15 @@ export const POPULAR_TOKENS: Record<number, Omit<Token, 'balance' | 'valueUsd'>[
   ],
 };
 
-// Get all available tokens for a chain (native + GCRM + ecosystem + popular)
+// Get all available tokens for a chain (native + GCRM + QFS + ecosystem + popular)
 export function getAvailableTokens(chainId: number): Omit<Token, 'balance' | 'valueUsd'>[] {
   const tokens: Omit<Token, 'balance' | 'valueUsd'>[] = [];
   const native = NATIVE_TOKENS[chainId];
   if (native) tokens.push(native);
   const gcrm = GCRM_TOKEN[chainId];
   if (gcrm) tokens.push(gcrm);
+  const qfs = QFS_TOKEN[chainId];
+  if (qfs) tokens.push(qfs);
   const ecosystem = GCRM_ECOSYSTEM_TOKENS[chainId] || [];
   tokens.push(...ecosystem);
   const popular = POPULAR_TOKENS[chainId] || [];
