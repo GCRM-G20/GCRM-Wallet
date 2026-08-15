@@ -347,15 +347,15 @@ function CreateWalletScreen() {
           {/* Step 0: Info */}
           {step === 0 && (
             <motion.div key="step0" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col items-center pt-12">
-              <div className="w-20 h-20 rounded-2xl overflow-hidden mb-6">
-                <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" />
+              <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center mb-6">
+                <Wallet className="size-10 text-primary" />
               </div>
               <h2 className="text-xl font-semibold mb-3">Create a New Wallet</h2>
               <p className="text-muted-foreground text-sm text-center max-w-xs mb-8">
-                Your wallet will be secured by a 12-word recovery phrase. Keep it safe — it&apos;s the only way to recover your funds.
+                Your wallet will be secured by a 12-word recovery phrase. Keep it safe, it&apos;s the only way to recover your funds.
               </p>
               <div className="w-full max-w-xs flex flex-col gap-3">
-                {['Non-custodial — only you control your keys', 'Multi-chain support from day one', 'Built-in staking & swap features'].map((feature, i) => (
+                {['Non-custodial, only you control your keys', 'Multi-chain support from day one', 'Built-in staking & swap features'].map((feature, i) => (
                   <div key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
                     <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                       <Check className="size-3 text-primary" />
