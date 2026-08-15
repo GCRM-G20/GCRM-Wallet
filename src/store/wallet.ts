@@ -34,6 +34,7 @@ interface WalletStore {
   tokens: Token[];
   addToken: (token: Token) => void;
   removeToken: (address: string) => void;
+  loadTokensForChain: (chainId: number) => void;
 
   // Transactions
   transactions: Transaction[];
@@ -103,8 +104,23 @@ export const useWalletStore = create<WalletStore>((set, get) => ({
 
   // Tokens
   tokens: [],
-  addToken: (token) => set((s) => ({ tokens: [...s.tokens, token] })),
-  removeToken: (address) => set((s) => ({ tokens: s.tokens.filter((t) => t.address !== address) })),
+  addToken: (token) => set((s) => {
+    const exists = s.tokens.find((t) => t.address === token.address && t.chainId === token.chainId);
+    if (exists) return s;
+    const updated = [...s.tokens, token];
+    saveToStorage('custom_tokens', updated);
+    return { tokens: updated };
+  }),
+  removeToken: (address) => set((s) => {
+    const updated = s.tokens.filter((t) => t.address !== address);
+    saveToStorage('custom_tokens', updated);
+    return { tokens: updated };
+  }),
+  loadTokensForChain: (chainId) => {
+    const saved = loadFromStorage<Token[]>('custom_tokens') || [];
+    const chainTokens = saved.filter((t) => t.chainId === chainId);
+    set({ tokens: chainTokens });
+  },
 
   // Transactions
   transactions: [],

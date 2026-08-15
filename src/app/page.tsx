@@ -13,6 +13,7 @@ import {
 } from '@/lib/wallet/core';
 import { SUPPORTED_CHAINS, getChainById, getExplorerUrl } from '@/lib/wallet/chains';
 import { STAKING_POOLS, calculateStakingRewards, formatAPY, formatTVL } from '@/lib/wallet/staking';
+import { NATIVE_TOKENS, GCRM_TOKEN, GCRM_ECOSYSTEM_TOKENS, POPULAR_TOKENS, getAvailableTokens } from '@/lib/wallet/tokens';
 import type { Screen } from '@/types/wallet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -1992,13 +1993,160 @@ function BottomNav() {
   );
 }
 
+// ─── Add Token Modal ───────────────────────────────────────────────────
+function AddTokenModal({ chainId, onClose }: { chainId: number; onClose: () => void }) {
+  const addToken = useWalletStore((s) => s.addToken);
+  const addToast = useWalletStore((s) => s.addToast);
+  const [mode, setMode] = useState<'search' | 'custom'>('search');
+  const [customAddress, setCustomAddress] = useState('');
+  const [customSymbol, setCustomSymbol] = useState('');
+  const [customDecimals, setCustomDecimals] = useState('18');
+  const [customName, setCustomName] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const chain = getChainById(chainId);
+  const availableTokens = useMemo(() => getAvailableTokens(chainId), [chainId]);
+  const filteredTokens = useMemo(() => {
+    if (!searchQuery) return availableTokens;
+    const q = searchQuery.toLowerCase();
+    return availableTokens.filter((t) => t.symbol.toLowerCase().includes(q) || t.name.toLowerCase().includes(q));
+  }, [availableTokens, searchQuery]);
+
+  const handleAddCustom = () => {
+    if (!customSymbol || !customAddress) {
+      addToast('Symbol and address are required', 'error');
+      return;
+    }
+    addToken({
+      symbol: customSymbol.toUpperCase(),
+      name: customName || customSymbol.toUpperCase(),
+      address: customAddress,
+      decimals: parseInt(customDecimals) || 18,
+      balance: '0.00',
+      valueUsd: 0,
+      chainId,
+    });
+    addToast(`${customSymbol.toUpperCase()} added to ${chain?.name}`, 'success');
+    onClose();
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        className="w-full max-w-md lg:max-w-lg mx-auto glass-card rounded-t-3xl p-5 max-h-[85vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="text-lg font-semibold">Add Token</h3>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5">
+            <X className="size-5 text-muted-foreground" />
+          </button>
+        </div>
+
+        <div className="flex gap-1 p-1 bg-secondary rounded-xl mb-4">
+          <button onClick={() => setMode('search')} className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${mode === 'search' ? 'bg-primary text-black' : 'text-muted-foreground'}`}>
+            Search
+          </button>
+          <button onClick={() => setMode('custom')} className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${mode === 'custom' ? 'bg-primary text-black' : 'text-muted-foreground'}`}>
+            Custom
+          </button>
+        </div>
+
+        {mode === 'search' ? (
+          <>
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <Input placeholder="Search by name or symbol..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              {filteredTokens.map((token) => (
+                <div key={token.address + token.symbol} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.03] transition-colors">
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${token.symbol === 'GCRM' ? 'overflow-hidden' : 'bg-secondary text-muted-foreground'}`}>
+                    {token.symbol === 'GCRM' ? <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : token.symbol.charAt(0)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium">{token.symbol}</p>
+                    <p className="text-xs text-muted-foreground truncate">{token.name}</p>
+                  </div>
+                  <button
+                    onClick={() => { addToken({ ...token, balance: '0.00', valueUsd: 0 }); addToast(`${token.symbol} added`, 'success'); onClose(); }}
+                    className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors"
+                  >Add</button>
+                </div>
+              ))}
+              {filteredTokens.length === 0 && (
+                <div className="text-center py-8">
+                  <p className="text-sm text-muted-foreground">No tokens found</p>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <div className="flex flex-col gap-4">
+            <div>
+              <label className="text-xs text-muted-foreground mb-1.5 block">Contract Address</label>
+              <Input placeholder="0x..." value={customAddress} onChange={(e) => setCustomAddress(e.target.value)} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-muted-foreground mb-1.5 block">Symbol</label>
+                <Input placeholder="TOKEN" value={customSymbol} onChange={(e) => setCustomSymbol(e.target.value)} />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1.5 block">Decimals</label>
+                <Input placeholder="18" value={customDecimals} onChange={(e) => setCustomDecimals(e.target.value)} />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground mb-1.5 block">Name (optional)</label>
+              <Input placeholder="Token Name" value={customName} onChange={(e) => setCustomName(e.target.value)} />
+            </div>
+            <button onClick={handleAddCustom} className="w-full h-12 rounded-xl gold-gradient text-black font-semibold hover:opacity-90 transition-opacity mt-2">
+              Add Token
+            </button>
+          </div>
+        )}
+
+        <p className="text-[10px] text-muted-foreground text-center mt-4">Network: {chain?.name} (Chain ID: {chainId})</p>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 // ─── Wallet Screen (token list view) ─────────────────────────────────
 function WalletScreen() {
   const navigate = useWalletStore((s) => s.navigate);
   const currentChainId = useWalletStore((s) => s.currentChainId);
   const selectChain = useWalletStore((s) => s.selectChain);
+  const loadTokensForChain = useWalletStore((s) => s.loadTokensForChain);
   const chain = getChainById(currentChainId);
   const [balanceHidden, setBalanceHidden] = useState(false);
+  const [showAddToken, setShowAddToken] = useState(false);
+
+  const chainTokens = useMemo(() => {
+    const tokens = [];
+    const native = NATIVE_TOKENS[currentChainId];
+    if (native) tokens.push({ ...native, balance: currentChainId === 1 ? '0.4521' : currentChainId === 56 ? '3.2100' : currentChainId === 101 ? '2.5000' : '0.0000', valueUsd: currentChainId === 1 ? 1478.50 : currentChainId === 56 ? 891.40 : currentChainId === 101 ? 350.00 : 0, change24h: 0 });
+    const gcrm = GCRM_TOKEN[currentChainId];
+    if (gcrm) tokens.push({ ...gcrm, balance: '12,580.00', valueUsd: 1132.20, change24h: 4.2 });
+    const ecosystem = GCRM_ECOSYSTEM_TOKENS[currentChainId] || [];
+    ecosystem.forEach((t) => tokens.push({ ...t, balance: '0.00', valueUsd: 0, change24h: 0 }));
+    const popular = POPULAR_TOKENS[currentChainId] || [];
+    popular.forEach((t) => tokens.push({ ...t, balance: t.symbol === 'USDT' ? '500.00' : '0.00', valueUsd: t.symbol === 'USDT' ? 500.00 : 0, change24h: 0 }));
+    return tokens;
+  }, [currentChainId]);
+
+  useEffect(() => { loadTokensForChain(currentChainId); }, [currentChainId, loadTokensForChain]);
 
   return (
     <motion.div key="wallet" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition} className="min-h-screen pb-24">
@@ -2008,7 +2156,7 @@ function WalletScreen() {
           <button onClick={() => setBalanceHidden(!balanceHidden)} className="p-2 rounded-lg hover:bg-white/5">
             {balanceHidden ? <EyeOff className="size-4 text-muted-foreground" /> : <Eye className="size-4 text-muted-foreground" />}
           </button>
-          <button className="p-2 rounded-lg hover:bg-white/5">
+          <button onClick={() => setShowAddToken(true)} className="p-2 rounded-lg hover:bg-white/5">
             <Plus className="size-4 text-primary" />
           </button>
         </div>
@@ -2017,17 +2165,11 @@ function WalletScreen() {
       {/* Chain filter */}
       <div className="px-4 mb-4">
         <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
-          <button
-            onClick={() => selectChain(currentChainId)}
-            className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-black text-xs font-medium"
-          >
-            {chain?.icon} {chain?.name}
-          </button>
-          {SUPPORTED_CHAINS.filter((c) => c.id !== currentChainId).map((c) => (
+          {SUPPORTED_CHAINS.map((c) => (
             <button
               key={c.id}
               onClick={() => selectChain(c.id)}
-              className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary text-muted-foreground text-xs hover:text-foreground transition-colors"
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${c.id === currentChainId ? 'bg-primary text-black' : 'bg-secondary text-muted-foreground hover:text-foreground'}`}
             >
               {c.icon} {c.symbol}
             </button>
@@ -2037,27 +2179,23 @@ function WalletScreen() {
 
       {/* Total balance */}
       <div className="px-4 mb-4">
-        <p className="text-3xl font-bold mb-1">
-          {balanceHidden ? '••••••' : '$4,001.10'}
-        </p>
+        <p className="text-3xl font-bold mb-1">{balanceHidden ? '••••••' : '$4,001.10'}</p>
         <p className="text-xs text-muted-foreground">Total balance on {chain?.name}</p>
       </div>
 
       {/* Token list */}
       <div className="px-4">
         <div className="flex flex-col gap-2">
-          {DEMO_TOKENS.map((token, i) => (
+          {chainTokens.map((token, i) => (
             <motion.div
-              key={token.symbol}
+              key={token.address + token.symbol}
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
+              transition={{ delay: i * 0.04 }}
               className="glass-card rounded-xl p-4 flex items-center justify-between cursor-pointer hover:bg-white/[0.03] transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold ${
-                  token.symbol === 'GCRM' ? 'overflow-hidden' : 'bg-secondary text-muted-foreground'
-                }`}>
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold ${token.symbol === 'GCRM' ? 'overflow-hidden' : 'bg-secondary text-muted-foreground'}`}>
                   {token.symbol === 'GCRM' ? <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : token.symbol.charAt(0)}
                 </div>
                 <div>
@@ -2066,9 +2204,9 @@ function WalletScreen() {
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm font-semibold">{balanceHidden ? '••••' : token.balance}</p>
-                <p className={`text-xs ${token.change24h >= 0 ? 'text-gcrm-green' : 'text-gcrm-red'}`}>
-                  {balanceHidden ? '' : `$${token.valueUsd.toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
+                <p className="text-sm font-semibold">{balanceHidden ? '••••' : (token as any).balance}</p>
+                <p className={`text-xs ${(token as any).change24h >= 0 ? 'text-gcrm-green' : 'text-gcrm-red'}`}>
+                  {balanceHidden ? '' : ((token as any).valueUsd > 0 ? `$${(token as any).valueUsd.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '—')}
                 </p>
               </div>
             </motion.div>
@@ -2080,6 +2218,10 @@ function WalletScreen() {
           <p className="text-xs text-muted-foreground">Demo data — connect to view real balances</p>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showAddToken && <AddTokenModal chainId={currentChainId} onClose={() => setShowAddToken(false)} />}
+      </AnimatePresence>
     </motion.div>
   );
 }
