@@ -84,8 +84,9 @@ const DEMO_TOKENS = [
 ];
 
 const DAPP_CONNECTIONS = [
-  { id: '1', name: 'PancakeSwap', domain: 'pancakeswap.finance', icon: '🍰', chainId: 56, permissions: ['View Address', 'Sign Transactions'], connected: true, lastUsed: '2 hours ago' },
-  { id: '2', name: 'Uniswap', domain: 'app.uniswap.org', icon: '🦄', chainId: 1, permissions: ['View Address'], connected: true, lastUsed: '1 day ago' },
+  { id: '1', name: 'NESG Swap', domain: 'exchange.nesgswap.org', icon: '/nesg-token-logo.png', chainId: 1, permissions: ['View Address', 'Sign Transactions'], connected: true, lastUsed: 'Just now' },
+  { id: '2', name: 'PancakeSwap', domain: 'pancakeswap.finance', icon: '🍰', chainId: 56, permissions: ['View Address', 'Sign Transactions'], connected: true, lastUsed: '2 hours ago' },
+  { id: '3', name: 'Uniswap', domain: 'app.uniswap.org', icon: '🦄', chainId: 1, permissions: ['View Address'], connected: true, lastUsed: '1 day ago' },
 ];
 
 // ─── Helper Components ───────────────────────────────────────────────
@@ -1527,6 +1528,7 @@ function DAppsScreen() {
   const addToast = useWalletStore((s) => s.addToast);
 
   const popularDApps = [
+    { name: 'NESG Swap', icon: '/nesg-token-logo.png', url: 'exchange.nesgswap.org', chain: 'ETH', isLogo: true },
     { name: 'PancakeSwap', icon: '🍰', url: 'pancakeswap.finance', chain: 'BSC' },
     { name: 'Uniswap', icon: '🦄', url: 'app.uniswap.org', chain: 'ETH' },
     { name: 'Aave', icon: '👻', url: 'app.aave.com', chain: 'Multi' },
@@ -1549,7 +1551,9 @@ function DAppsScreen() {
         <h3 className="text-sm font-semibold mb-3">Connected</h3>
         {DAPP_CONNECTIONS.map((dapp) => (
           <div key={dapp.id} className="glass-card rounded-xl p-3.5 flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-xl">{dapp.icon}</div>
+            <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-xl overflow-hidden">
+              {dapp.icon.startsWith('/') ? <img src={dapp.icon} alt={dapp.name} className="w-full h-full object-cover" /> : dapp.icon}
+            </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium">{dapp.name}</p>
               <p className="text-xs text-muted-foreground truncate">{dapp.domain} · {dapp.lastUsed}</p>
@@ -1572,7 +1576,9 @@ function DAppsScreen() {
               onClick={() => addToast(`Opening ${dapp.name}...`, 'info')}
               className="glass-card rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-white/[0.03] transition-colors"
             >
-              <span className="text-2xl">{dapp.icon}</span>
+              <span className="text-2xl flex items-center justify-center w-10 h-10 overflow-hidden rounded-lg">
+                {dapp.icon.startsWith('/') ? <img src={dapp.icon} alt={dapp.name} className="w-full h-full object-cover" /> : dapp.icon}
+              </span>
               <span className="text-xs font-medium text-center">{dapp.name}</span>
               <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{dapp.chain}</Badge>
             </motion.button>
