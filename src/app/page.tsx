@@ -142,6 +142,13 @@ function ToastContainer() {
 function OnboardingScreen() {
   const navigate = useWalletStore((s) => s.navigate);
   const setShowOnboarding = useWalletStore((s) => s.setShowOnboarding);
+
+  const features = [
+    { icon: Key, label: 'Non-custodial', desc: 'Only you control your keys' },
+    { icon: Globe, label: 'Multi-chain', desc: 'Support from day one' },
+    { icon: ArrowLeftRight, label: 'Staking & Swap', desc: 'Built-in DeFi features' },
+  ];
+
   return (
     <motion.div
       key="onboarding"
@@ -156,13 +163,14 @@ function OnboardingScreen() {
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-primary/5 blur-[100px] pointer-events-none" />
       <div className="absolute bottom-1/4 left-1/3 w-[200px] h-[200px] rounded-full bg-primary/3 blur-[80px] pointer-events-none" />
 
+      {/* Large Logo */}
       <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
+        initial={{ scale: 0.7, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.6, ease: 'easeOut' }}
-        className="relative mb-8"
+        transition={{ delay: 0.15, duration: 0.7, ease: 'easeOut' }}
+        className="relative mb-6"
       >
-        <div className="w-28 h-28 rounded-3xl gcrm-glow overflow-hidden">
+        <div className="w-36 h-36 rounded-[2rem] gcrm-glow overflow-hidden shadow-[0_0_60px_rgba(212,160,23,0.2)]">
           <img src="/gcrm-logo.png" alt="GCRM Wallet" className="w-full h-full object-cover" />
         </div>
       </motion.div>
@@ -170,8 +178,8 @@ function OnboardingScreen() {
       <motion.h1
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.5 }}
-        className="text-4xl font-bold tracking-tight mb-2"
+        transition={{ delay: 0.35, duration: 0.5 }}
+        className="text-4xl font-bold tracking-tight mb-1.5"
       >
         <span className="gcrm-glow-text text-primary">GCRM</span>{' '}
         <span className="text-foreground">Wallet</span>
@@ -180,16 +188,37 @@ function OnboardingScreen() {
       <motion.p
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.55, duration: 0.5 }}
-        className="text-muted-foreground text-sm tracking-widest uppercase mb-12"
+        transition={{ delay: 0.5, duration: 0.5 }}
+        className="text-muted-foreground text-sm tracking-widest uppercase mb-6"
       >
         Secure. Non-Custodial. Multichain. Web3.
       </motion.p>
 
+      {/* Feature list with icons */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+        className="w-full max-w-xs flex flex-col gap-3 mb-8"
+      >
+        {features.map((f, i) => (
+          <div key={i} className="flex items-center gap-3 text-sm">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/15 flex items-center justify-center shrink-0">
+              <f.icon className="size-4 text-primary" />
+            </div>
+            <div>
+              <span className="text-foreground font-medium">{f.label}</span>
+              <span className="text-muted-foreground"> — {f.desc}</span>
+            </div>
+          </div>
+        ))}
+      </motion.div>
+
+      {/* Action Buttons */}
       <motion.div
         initial={{ y: 30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.7, duration: 0.5 }}
+        transition={{ delay: 0.75, duration: 0.5 }}
         className="w-full max-w-xs flex flex-col gap-3"
       >
         <button
@@ -210,7 +239,7 @@ function OnboardingScreen() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        className="mt-12 flex items-center gap-2 text-muted-foreground text-xs"
+        className="mt-8 flex items-center gap-2 text-muted-foreground text-xs"
       >
         <Shield className="size-3" />
         <span>Your keys, your crypto. Always.</span>
