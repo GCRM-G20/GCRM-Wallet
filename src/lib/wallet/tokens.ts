@@ -10,46 +10,46 @@ export const NATIVE_TOKENS: Record<number, Omit<Token, 'balance' | 'valueUsd'>> 
   8453: { symbol: 'ETH', name: 'Base ETH', address: '0x0', decimals: 18, chainId: 8453 },
 };
 
-// GCRM Token
+// GCRM Token - Global Currency Restart Master
 export const GCRM_TOKEN: Record<number, Omit<Token, 'balance' | 'valueUsd'>> = {
   1: {
     symbol: 'GCRM',
-    name: 'GCRM Token',
-    address: process.env.NEXT_PUBLIC_GCRM_ADDRESS_ETH || '0x0000000000000000000000000000000000000000',
+    name: 'Global Currency Restart Master',
+    address: process.env.NEXT_PUBLIC_GCRM_ADDRESS_ETH || '0x2ae2d0dfdb1b3b03a771167c43b983a97b65b9b3',
     decimals: 18,
     chainId: 1,
   },
   56: {
     symbol: 'GCRM',
-    name: 'GCRM Token',
+    name: 'Global Currency Restart Master',
     address: process.env.NEXT_PUBLIC_GCRM_ADDRESS_BSC || '0x0000000000000000000000000000000000000000',
     decimals: 18,
     chainId: 56,
   },
   137: {
     symbol: 'GCRM',
-    name: 'GCRM Token',
+    name: 'Global Currency Restart Master',
     address: process.env.NEXT_PUBLIC_GCRM_ADDRESS_POLYGON || '0x0000000000000000000000000000000000000000',
     decimals: 18,
     chainId: 137,
   },
   101: {
     symbol: 'GCRM',
-    name: 'GCRM Token',
+    name: 'Global Currency Restart Master',
     address: process.env.NEXT_PUBLIC_GCRM_ADDRESS_SOLANA || '11111111111111111111111111111111',
     decimals: 9,
     chainId: 101,
   },
   42161: {
     symbol: 'GCRM',
-    name: 'GCRM Token',
+    name: 'Global Currency Restart Master',
     address: process.env.NEXT_PUBLIC_GCRM_ADDRESS_ARB || '0x0000000000000000000000000000000000000000',
     decimals: 18,
     chainId: 42161,
   },
   8453: {
     symbol: 'GCRM',
-    name: 'GCRM Token',
+    name: 'Global Currency Restart Master',
     address: process.env.NEXT_PUBLIC_GCRM_ADDRESS_BASE || '0x0000000000000000000000000000000000000000',
     decimals: 18,
     chainId: 8453,

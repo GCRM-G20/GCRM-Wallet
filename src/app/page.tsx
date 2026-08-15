@@ -77,7 +77,7 @@ const DEMO_TRANSACTIONS = [
 ];
 
 const DEMO_TOKENS = [
-  { symbol: 'GCRM', name: 'GCRM Token', balance: '12,580.00', valueUsd: 1132.20, change24h: 4.2 },
+  { symbol: 'GCRM', name: 'Global Currency Restart Master', balance: '12,580.00', valueUsd: 1132.20, change24h: 4.2 },
   { symbol: 'ETH', name: 'Ethereum', balance: '0.4521', valueUsd: 1478.50, change24h: -1.3 },
   { symbol: 'BNB', name: 'BNB', balance: '3.2100', valueUsd: 891.40, change24h: 2.1 },
   { symbol: 'USDT', name: 'Tether USD', balance: '500.00', valueUsd: 500.00, change24h: 0.0 },
@@ -737,10 +737,10 @@ function DashboardScreen() {
           <div className="bg-black/30 rounded-xl p-3.5 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg overflow-hidden">
-                <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" />
+                <img src="/gcrm-token-logo.png" alt="GCRM" className="w-full h-full object-cover" />
               </div>
               <div>
-                <p className="text-sm font-medium">GCRM Token</p>
+                <p className="text-sm font-medium">GCRM</p>
                 <p className="text-xs text-muted-foreground">{balanceHidden ? '••••••' : `${gcrmBalance || '12,580.00'} GCRM`}</p>
               </div>
             </div>
@@ -815,7 +815,7 @@ function DashboardScreen() {
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold overflow-hidden ${
                   token.symbol === 'GCRM' ? '' : 'bg-secondary text-muted-foreground'
                 }`}>
-                  {token.symbol === 'GCRM' ? <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : token.symbol.charAt(0)}
+                  {token.symbol === 'GCRM' ? <img src="/gcrm-token-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : token.symbol.charAt(0)}
                 </div>
                 <div>
                   <p className="text-sm font-medium">{token.symbol}</p>
@@ -1189,7 +1189,7 @@ function SwapScreen() {
                   />
                   <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary hover:bg-white/5 transition-colors shrink-0">
                     <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden ${fromToken === 'GCRM' ? '' : 'bg-blue-500/20 text-blue-400'}`}>
-                      {fromToken === 'GCRM' ? <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : fromToken.charAt(0)}
+                      {fromToken === 'GCRM' ? <img src="/gcrm-token-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : fromToken.charAt(0)}
                     </span>
                     <span className="text-sm font-medium">{fromToken}</span>
                   </button>
@@ -1222,7 +1222,7 @@ function SwapScreen() {
                   />
                   <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary hover:bg-white/5 transition-colors shrink-0">
                     <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden ${toToken === 'GCRM' ? '' : 'bg-blue-500/20 text-blue-400'}`}>
-                      {toToken === 'GCRM' ? <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : toToken.charAt(0)}
+                      {toToken === 'GCRM' ? <img src="/gcrm-token-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : toToken.charAt(0)}
                     </span>
                     <span className="text-sm font-medium">{toToken}</span>
                   </button>
@@ -2072,7 +2072,7 @@ function AddTokenModal({ chainId, onClose }: { chainId: number; onClose: () => v
               {filteredTokens.map((token) => (
                 <div key={token.address + token.symbol} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.03] transition-colors">
                   <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${token.symbol === 'GCRM' ? 'overflow-hidden' : 'bg-secondary text-muted-foreground'}`}>
-                    {token.symbol === 'GCRM' ? <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : token.symbol.charAt(0)}
+                    {token.symbol === 'GCRM' ? <img src="/gcrm-token-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : token.symbol.charAt(0)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">{token.symbol}</p>
@@ -2196,7 +2196,7 @@ function WalletScreen() {
             >
               <div className="flex items-center gap-3">
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold ${token.symbol === 'GCRM' ? 'overflow-hidden' : 'bg-secondary text-muted-foreground'}`}>
-                  {token.symbol === 'GCRM' ? <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : token.symbol.charAt(0)}
+                  {token.symbol === 'GCRM' ? <img src="/gcrm-token-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : token.symbol.charAt(0)}
                 </div>
                 <div>
                   <p className="text-sm font-semibold">{token.symbol}</p>
