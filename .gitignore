@@ -60,3 +60,4 @@ scripts/
 # Z-AI internal
 .zscripts/
 .cache/
+upload/
