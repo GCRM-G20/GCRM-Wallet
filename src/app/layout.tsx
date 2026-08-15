@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: "GCRM Wallet - Secure. Non-Custodial. Multichain. Web3.",
   description: "A secure Web3 non-custodial wallet for managing GCRM and digital assets across multiple blockchains.",
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◆</text></svg>",
+    icon: "/gcrm-logo.png",
   },
 };
 

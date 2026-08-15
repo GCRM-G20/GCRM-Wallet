@@ -162,8 +162,8 @@ function OnboardingScreen() {
         transition={{ delay: 0.2, duration: 0.6, ease: 'easeOut' }}
         className="relative mb-8"
       >
-        <div className="w-28 h-28 rounded-3xl gold-gradient flex items-center justify-center gcrm-glow">
-          <span className="text-5xl text-black/80 font-bold">◆</span>
+        <div className="w-28 h-28 rounded-3xl gcrm-glow overflow-hidden">
+          <img src="/gcrm-logo.png" alt="GCRM Wallet" className="w-full h-full object-cover" />
         </div>
       </motion.div>
 
@@ -318,8 +318,8 @@ function CreateWalletScreen() {
           {/* Step 0: Info */}
           {step === 0 && (
             <motion.div key="step0" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="flex flex-col items-center pt-12">
-              <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-6">
-                <Shield className="size-10 text-primary" />
+              <div className="w-20 h-20 rounded-2xl overflow-hidden mb-6">
+                <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" />
               </div>
               <h2 className="text-xl font-semibold mb-3">Create a New Wallet</h2>
               <p className="text-muted-foreground text-sm text-center max-w-xs mb-8">
@@ -665,8 +665,8 @@ function DashboardScreen() {
       {/* Header */}
       <div className="px-4 pt-4 pb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl gold-gradient flex items-center justify-center">
-            <span className="text-black font-bold text-sm">◆</span>
+          <div className="w-9 h-9 rounded-xl overflow-hidden">
+            <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" />
           </div>
           <div>
             <p className="text-xs text-muted-foreground">GCRM Wallet</p>
@@ -706,8 +706,8 @@ function DashboardScreen() {
           {/* GCRM specific balance */}
           <div className="bg-black/30 rounded-xl p-3.5 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg gold-gradient flex items-center justify-center">
-                <span className="text-black text-xs font-bold">G</span>
+              <div className="w-8 h-8 rounded-lg overflow-hidden">
+                <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" />
               </div>
               <div>
                 <p className="text-sm font-medium">GCRM Token</p>
@@ -782,10 +782,10 @@ function DashboardScreen() {
               className="glass-card rounded-xl p-3.5 flex items-center justify-between hover:bg-white/[0.03] transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold ${
-                  token.symbol === 'GCRM' ? 'gold-gradient text-black' : 'bg-secondary text-muted-foreground'
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold overflow-hidden ${
+                  token.symbol === 'GCRM' ? '' : 'bg-secondary text-muted-foreground'
                 }`}>
-                  {token.symbol === 'GCRM' ? 'G' : token.symbol.charAt(0)}
+                  {token.symbol === 'GCRM' ? <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : token.symbol.charAt(0)}
                 </div>
                 <div>
                   <p className="text-sm font-medium">{token.symbol}</p>
@@ -1158,8 +1158,8 @@ function SwapScreen() {
                     className="flex-1 bg-transparent text-2xl font-semibold outline-none min-w-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary hover:bg-white/5 transition-colors shrink-0">
-                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${fromToken === 'GCRM' ? 'gold-gradient text-black' : 'bg-blue-500/20 text-blue-400'}`}>
-                      {fromToken.charAt(0)}
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden ${fromToken === 'GCRM' ? '' : 'bg-blue-500/20 text-blue-400'}`}>
+                      {fromToken === 'GCRM' ? <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : fromToken.charAt(0)}
                     </span>
                     <span className="text-sm font-medium">{fromToken}</span>
                   </button>
@@ -1191,8 +1191,8 @@ function SwapScreen() {
                     className="flex-1 bg-transparent text-2xl font-semibold outline-none min-w-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary hover:bg-white/5 transition-colors shrink-0">
-                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${toToken === 'GCRM' ? 'gold-gradient text-black' : 'bg-blue-500/20 text-blue-400'}`}>
-                      {toToken.charAt(0)}
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden ${toToken === 'GCRM' ? '' : 'bg-blue-500/20 text-blue-400'}`}>
+                      {toToken === 'GCRM' ? <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : toToken.charAt(0)}
                     </span>
                     <span className="text-sm font-medium">{toToken}</span>
                   </button>
@@ -1664,8 +1664,8 @@ function SettingsScreen() {
 
         {/* App info */}
         <div className="text-center py-4">
-          <div className="w-8 h-8 rounded-lg gold-gradient flex items-center justify-center mx-auto mb-2">
-            <span className="text-black text-xs font-bold">◆</span>
+          <div className="w-8 h-8 rounded-lg overflow-hidden mx-auto mb-2">
+            <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" />
           </div>
           <p className="text-xs text-muted-foreground">GCRM Wallet v1.0.0</p>
           <p className="text-[10px] text-muted-foreground mt-1">Secure. Non-Custodial. Multichain.</p>
@@ -1755,9 +1755,9 @@ function WalletLockScreen() {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.1 }}
-        className="w-20 h-20 rounded-3xl gold-gradient flex items-center justify-center gcrm-glow mb-8"
+        className="w-20 h-20 rounded-3xl gcrm-glow mb-8 overflow-hidden"
       >
-        <Lock className="size-8 text-black" />
+        <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" />
       </motion.div>
 
       <motion.h1
@@ -2027,9 +2027,9 @@ function WalletScreen() {
             >
               <div className="flex items-center gap-3">
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold ${
-                  token.symbol === 'GCRM' ? 'gold-gradient text-black' : 'bg-secondary text-muted-foreground'
+                  token.symbol === 'GCRM' ? 'overflow-hidden' : 'bg-secondary text-muted-foreground'
                 }`}>
-                  {token.symbol === 'GCRM' ? 'G' : token.symbol.charAt(0)}
+                  {token.symbol === 'GCRM' ? <img src="/gcrm-logo.png" alt="GCRM" className="w-full h-full object-cover" /> : token.symbol.charAt(0)}
                 </div>
                 <div>
                   <p className="text-sm font-semibold">{token.symbol}</p>
