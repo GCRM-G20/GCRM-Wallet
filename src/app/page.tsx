@@ -206,9 +206,9 @@ function OnboardingScreen() {
             <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/15 flex items-center justify-center shrink-0">
               <f.icon className="size-4 text-primary" />
             </div>
-            <div>
+            <div className="leading-tight">
               <span className="text-foreground font-medium">{f.label}</span>
-              <span className="text-muted-foreground"> — {f.desc}</span>
+              <span className="text-muted-foreground"> {f.desc}</span>
             </div>
           </div>
         ))}
