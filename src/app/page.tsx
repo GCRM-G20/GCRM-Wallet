@@ -129,7 +129,8 @@ function ToastContainer() {
               className={`w-2 h-2 rounded-full shrink-0 ${
                 toast.type === 'success' ? 'bg-gcrm-green' : toast.type === 'error' ? 'bg-gcrm-red' : 'bg-primary'
               }`}
-            />\n            <span className="text-sm flex-1">{toast.message}</span>
+            />
+            <span className="text-sm flex-1">{toast.message}</span>
             <button onClick={() => removeToast(toast.id)} className="text-muted-foreground hover:text-foreground">
               <X className="size-4" />
             </button>
@@ -1670,7 +1671,8 @@ function SettingsScreen() {
                 >
                   <item.icon className="size-4 text-muted-foreground" />
                   <span className="text-sm flex-1">{item.label}</span>
-                  {item.trailing && <span className="text-xs text-muted-foreground">{item.trailing}</span>}\n                  <ChevronRight className="size-4 text-muted-foreground" />
+                  {item.trailing && <span className="text-xs text-muted-foreground">{item.trailing}</span>}
+                  <ChevronRight className="size-4 text-muted-foreground" />
                 </button>
               ))}
             </div>
